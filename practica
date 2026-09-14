@@ -36,4 +36,4 @@ _start:
 //esto es solo para salir
     mov     x0, #0 //para los errores antes de salir
     mov     x8, #93
-    svc     #0 //mira a x8 y #93 transmite para salir entiende y sale
+    svc     #0 //mira a x8 y #93 transmite para salir #0 entiende y sale
