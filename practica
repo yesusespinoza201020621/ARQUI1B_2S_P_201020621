@@ -138,7 +138,7 @@ _start:
 
     // 1. Cargamos el PRIMER carácter que el usuario escribió en la variable 'opcion'
     ldr x1, =opcion     // Cargamos la dirección de la variable
-    ldrb w0, [x1]       // ldrb (Load Register Byte) extrae solo el primer carácter ('1')
+    ldrb w0, [x1]       // extrae solo el primer carácter ('1')
 
     // 2. Aplicamos el IF comparando con el carácter '1'
     cmp w0, #'1'        // Compara el carácter guardado con el carácter '1'
@@ -152,11 +152,11 @@ _start:
     mov     x8, #64         // escribir texto
     svc     #0
 
-    b .L_end            // Salta al final para no entrar al else accidentalmente
+    b .L_end            // Salta al final para no entrar al else
 
 .L_else:
-    // --- CÓDIGO SI ELIGIÓ OTRA OPCIÓN ---
-    // Pon aquí lo que pasa si presionó cualquier otra tecla
+    // si elige otra opción tira mendaje de rror
+
       mov     x0, #1
     ldr     x1, =mensajerror
     mov     x2, #len11
