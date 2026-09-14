@@ -1,0 +1,39 @@
+.section .data//reservar memoria para mis variables globales
+
+//guardamos memoria inicial y el puntero de memoria osea la direccion de memoria, son mis datos ok
+mensaje1:     .ascii "Practica ünica "
+len1 = . - mensaje1
+mensaje2:     .ascii "Yesus Rudy Espinoza Pivaral 201020621 "
+len2 = . - mensaje2
+mensaje3:     .ascii "Calculadora de Numeros enteros en Ensamblador ARM64 desde linux ubuntu"
+len3 = . - mensaje3
+
+
+
+mensaje4:       .ascii "Ingresa el segundo numero: "
+len4 = . - mensaje4
+
+msg3:       .ascii "El resultado de la suma es: "
+len5 = . - msg3
+
+.section .bss
+buffer1:    .space 10       // Almacén para el primer texto 
+buffer2:    .space 10        // Almacén para el segundo texto 
+buffer3:    .space 10        // Almacén para el tercer texto
+res_txt:    .space 10       // Almacén para el texto del resultado
+
+.section .text
+.global _start
+
+//vamos a comenzar
+_start:
+    mov     x0, #1
+    ldr     x1, =mensaje1
+    mov     x2, #len1
+    mov     x8, #64         // escribir texto
+    svc     #0
+
+//esto es solo para salir
+    mov     x0, #0 //para los errores antes de salir
+    mov     x8, #93
+    svc     #0 //mira a x8 y #93 transmite para salir entiende y sale
