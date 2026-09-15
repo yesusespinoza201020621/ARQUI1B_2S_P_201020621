@@ -1,4 +1,4 @@
-..section .data//reservar memoria para mis variables globales
+.section .data//reservar memoria para mis variables globales
 
 //guardamos memoria inicial y el puntero de memoria osea la direccion de memoria, son mis datos ok
 mensaje1:     .ascii "Practica ünica \n"
