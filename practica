@@ -1,4 +1,4 @@
-.section .data//reservar memoria para mis variables globales
+..section .data//reservar memoria para mis variables globales
 
 //guardamos memoria inicial y el puntero de memoria osea la direccion de memoria, son mis datos ok
 mensaje1:     .ascii "Practica ünica \n"
@@ -31,22 +31,25 @@ len9 = . - potencia9
 factorial10:     .ascii "Opcion 5 factorial \n"
 len10 = . - factorial10
 
-mensajerror:     .ascii "las opciones validas solo las del menu \n"
+mensajerror:     .ascii "las opciones validas solo las del menu"
 len11 = . - mensajerror
 
+num1:     .ascii "ingrese numero 1 \n"
+len12 = . - num1
 
-/*mensaje14:       .ascii "Ingresa el segundo numero: "
-len14 = . - mensaje14
+num2:     .ascii "ingrese numero 2 \n"
+len13 = . - num2
 
-msg13:       .ascii "El resultado de la suma es: "
-len13 = . - msg13*/
+
+resultadosuma:       .ascii "El resultado de la suma es: "
+len14 = . - resultadosuma
 
 newline:    .ascii "\n"
 
 .section .bss
 opcion:   .space 2 //almacenar la opcion a elegir
-buffer1:    .space 10       // Almacén para el primer texto 
-buffer2:    .space 10        // Almacén para el segundo texto 
+numero1:    .space 10       // Almacén numero 1 que se va a sumar
+numero2:    .space 10        //almacena numero 2 que se va a restar
 buffer3:    .space 10        // Almacén para el tercer texto
 buffer4:    .space 10        // Almacén para el tercer texto
 buffer5:    .space 10        // Almacén para el tercer texto
@@ -134,6 +137,7 @@ _start:
    
 
  //aca empieza los if's
+
     mov x21, x0         // X21 guarda cuántas letras escribió el usuario
 
     // 1. Cargamos el PRIMER carácter que el usuario escribió en la variable 'opcion'
@@ -147,22 +151,106 @@ _start:
 .L_if:
    
     mov     x0, #1
-    ldr     x1, =mensaje1
-    mov     x2, #len1
+    ldr     x1, =num1
+    mov     x2, #len12
     mov     x8, #64         // escribir texto
     svc     #0
 
-    b .L_end            // Salta al final para no entrar al else
+    mov     x0, #0
+    ldr     x1, =numero1
+    mov     x2, #10
+    mov     x8, #63         // obtener numero 1
+    svc     #0
+    mov     x21, x0  //x21 aqui se guarda para convetir a entero
 
+    mov     x0, #1
+    ldr     x1, =num2
+    mov     x2, #len13
+    mov     x8, #64         // escribir texto
+    svc     #0
+
+    mov     x0, #0
+    ldr     x1, =numero2
+    mov     x2, #10
+    mov     x8, #63         // obtener numero 2
+    svc     #0
+    mov     x22, x0   //aca se guarda en memoria para convertir posterior a entero
+
+    mov     x0, #1
+    ldr     x1, =resultadosuma
+    mov     x2, #len14
+    mov     x8, #64
+    svc     #0
+// -----------------------------------------------------------------
+    // 3. Convertir numero 1 de texto a entero matemático (guardado en x19)
+    // -----------------------------------------------------------------
+    ldr     x0, =numero1
+    mov     x1, x21         // longitud
+    bl      ascii_to_int
+    mov     x19, x0         // x19 = valor del primer número
+
+    // -----------------------------------------------------------------
+    // 4. Convertir numero 2 de texto a entero matemático (guardado en x20)
+    // -----------------------------------------------------------------
+    ldr     x0, =numero2
+    mov     x1, x22         // longitud
+    bl      ascii_to_int
+    mov     x20, x0         // x20 = valor del segundo número
+
+
+//vamos hacer la suma x5 alli guardamos el resultado 
+    add    x5, x19, x20   //add es para hacer la suma pero lo tengo que pasar a texto para mostrarlo en x5 el resultado
+
+    ldr     x1, =res_txt 
+    add     x1, x1, #9      
+    mov     x2, #10         // Divisor fijo = 10
+    mov     x6, #0          // Contador de dígitos generados
+
+
+//necesitamos sumar mas de 1 bite
+int_to_ascii_loop:
+    udiv    x3, x5, x2      // Cociente
+    msub    x4, x3, x2, x5  // Residuo (x5 % 10)
+    add     x4, x4, #48     // Convertir residuo a carácter ASCII
+    sub     x1, x1, #1
+    strb    w4, [x1]        // Guardar byte
+    add     x6, x6, #1      // Sumar contador
+    mov     x5, x3          // El nuevo número es el cociente
+    cbnz    x5, int_to_ascii_loop
+
+   // Guardamos las coordenadas del texto generado
+     mov     x23, x1         // Dirección de inicio del resultado
+    mov     x24, x6         // Longitud de caracteres del resultado*/
+
+
+// solo es para imprimir el resultado luego que ya hizo todo lo demas
+    mov     x0, #1
+    mov     x1, x23
+    mov     x2, x24
+    mov     x8, #64
+    svc     #0
+
+     b .L_end            // Salta al final para no entrar al else
+
+ 
+    
 .L_else:
     // si elige otra opción tira mendaje de rror
+
+    
 
       mov     x0, #1
     ldr     x1, =mensajerror
     mov     x2, #len11
     mov     x8, #64         // escribir texto
     svc     #0
-    
+ // Imprimir salto de línea final
+    mov     x0, #1
+    ldr     x1, =newline
+    mov     x2, #1
+    mov     x8, #64
+    svc     #0
+
 .L_end:
 
 
@@ -170,3 +258,36 @@ _start:
     mov     x0, #0 //para los errores antes de salir
     mov     x8, #93
     svc     #0 //mira a x8 y #93 transmite para salir entiende y sale
+
+//necesito crear la funcion entero para que haga la conversión todo es de cero para que se pueda ensamblar
+ascii_to_int:
+    mov     x2, #0          // esto es para armar el numero final para el registro
+    mov     x3, #0          // recorer como un bucle
+    mov     x4, #10         // base numerica de 10 para guardar en el registro
+
+parse_loop:
+    cmp     x3, x1
+    bge     parse_end       // Si ya recorrimos todo el string, terminar
+    ldrb    w5, [x0, x3]    // Leer carácter por carácter
+    
+
+    
+    // Validar si el carácter es un número real ('0' al '9')
+    cmp     w5, #48
+    blt     parse_end       // Si es menor a '0', terminar
+    cmp     w5, #57
+    bgt     parse_end       // Si es mayor a '9', terminar
+
+    sub     w5, w5, #48     // Convertir de carácter a valor matemático (0-9)
+    mul     x2, x2, x4      // Acumulador = Acumulador * 10
+    add     x2, x2, x5      // Acumulador = Acumulador + Nuevo Dígito
+
+skip_char:
+    add     x3, x3, #1      // Siguiente letra
+    b       parse_loop
+
+parse_end:
+    mov     x0, x2          // Mover el total acumulado al registro de retorno x0
+    ret
+
+
