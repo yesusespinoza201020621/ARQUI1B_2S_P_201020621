@@ -60,6 +60,7 @@ res_txt:    .space 10       // Almacén para el texto del resultado
 .global _start
 
 //vamos a comenzar
+
 _start:
     mov     x0, #1
     ldr     x1, =mensaje1
