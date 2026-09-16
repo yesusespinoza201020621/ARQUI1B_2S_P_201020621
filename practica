@@ -430,10 +430,12 @@ _start:
     mov     x5, #1          // El acumulador empieza en 1 (Caso base para exponente = 0)
 
 .L_potencia_loop:
-    cmp     x20, #0         // ¿El exponente es 0 o llegó a 0?
+    cmp     x20, #0         // ¿El exponente llegó a 0?
     b.eq    .L_imprimir_resultado
 
-    mul     x5, x5, x19     // X5 = acumulador * basesub     x20, x20, #1    // exponente = exponente - 1b       .L_potencia_loop
+    mul     x5, x5, x19     // X5 = acumulador * base
+    sub     x20, x20, #1    // exponente = exponente - 1
+    b       .L_potencia_loop //aqui hace el ciclo repetivo hasta llegar a cero 0
 
 //opción 6 para el factorial
 .L_opcion6: 
