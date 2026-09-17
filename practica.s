@@ -40,6 +40,7 @@ len12 = . - num1
 num2:     .ascii "ingrese numero 2 \n"
 len13 = . - num2
 
+
 resultadosuma:       .ascii "El resultado de la suma es: "
 len14 = . - resultadosuma
 
@@ -52,19 +53,38 @@ len16 = . - resultadoresta
 resultadodiv:         .ascii "El resultado de la división entera es: "
 len17 = . - resultadodiv
 
+base1:     .ascii "ingrese la base \n"
+lenbase = . - base1
+
+exponente1:     .ascii "ingrese el exponente \n"
+lenexp = . - exponente1
+
+msgfactorial:     .ascii "ingrese numero para obtener el factorial \n"
+lenfactorial = . - msgfactorial
+
+resultadopot:         .ascii "El resultado de la potencia es: "
+len_pot = . - resultadopot
+
 msg_desea_continuar:  .ascii "¿Desea continuar? (s/n): "
 len_continuar = . - msg_desea_continuar
 
 mensajerrordivision:     .ascii "division entre cero no se puede hacer bueno da oo(infinito)"
 len18 = . - mensajerrordivision
 
+resultadofact: .ascii "El factorial es: "
+len_resultado = . - resultadofact
+
+
 newline:    .ascii "\n"
 
-.section .bss
+.section .bss //lectura
 opcion:       .space 16 
 numero1:      .space 16 
 numero2:      .space 16 
+numfactorial: .space 16
 res_txt:      .space 16 
+base:         .space 16 // variable para la base
+exponente:    .space 16 // variable para el exponente
 resp_cont:    .space 16 // Espacio para guardar la respuesta de continuar (s/n)
 
 .section .text
@@ -149,7 +169,7 @@ _start:
     ldr     x1, =opcion     
     ldrb    w0, [x1]       
 
-    // como el switch case en alto nivel
+    // es como el switch case en alto nivel
     cmp     w0, #'1'        
     b.eq    .L_opcion1     
 
@@ -171,9 +191,9 @@ _start:
     //si se ingresa otra cosa tira mensaje de error
     b       .L_error
 
-    //me sirve para la division entre cero
+    //me sirve para la division entre 0
     b .L_errordivision
-// opciónn1 de la suma
+// opciónn 1 de la suma
 .L_opcion1: 
     mov     x0, #1
     ldr     x1, =num1
@@ -221,7 +241,7 @@ _start:
     b       .L_imprimir_resultado
 
 
-// opción2 de la resta
+// opción 2 de la resta
 
 .L_opcion2: 
     mov     x0, #1
@@ -270,7 +290,7 @@ _start:
     b       .L_imprimir_resultado
 
 
-// opcion3 para la multipliación
+// opcion 3 para la multipliación
 .L_opcion3: 
     mov     x0, #1          
     ldr     x1, =num1     
@@ -371,11 +391,75 @@ _start:
     b       .L_imprimir_resultado
 
 //opción 5 para la potencoa
-.L_opcion5:
+.L_opcion5: 
+
+    mov     x0, #1
+    ldr     x1, =base1 
+    mov     x2, #lenbase
+    mov     x8, #64         
+    svc     #0
+
+    mov     x0, #0
+    ldr     x1, =base         
+    mov     x2, #10
+    mov     x8, #63         
+    svc     #0
+    mov     x21, x0  
+
+    mov     x0, #1
+    ldr     x1, =exponente1
+    mov     x2, #lenexp
+    mov     x8, #64         
+    svc     #0
+
+    mov     x0, #0
+    ldr     x1, =exponente    
+    mov     x2, #10
+    mov     x8, #63         
+    svc     #0
+    mov     x22, x0   
+
+    mov     x0, #1
+    ldr     x1, =resultadopot 
+    mov     x2, #len_pot
+    mov     x8, #64
+    svc     #0
+
+    ldr     x0, =base
+    mov     x1, x21         
+    bl      ascii_to_int
+    mov     x19, x0         // X19 = Base matemática
+
+    ldr     x0, =exponente
+    mov     x1, x22         
+    bl      ascii_to_int
+    mov     x20, x0         // X20 = Exponente matemático
+
+    mov     x5, #1          // El acumulador empieza en 1 (Caso base para exponente = 0)
+
+.L_potencia_loop:
+    cmp     x20, #0         // ¿El exponente llegó a 0?
+    b.eq    .L_imprimir_resultado
+
+    mul     x5, x5, x19     // X5 = acumulador * base
+    sub     x20, x20, #1    // exponente = exponente - 1
+    b       .L_potencia_loop //aqui hace el ciclo repetivo hasta llegar a cero 0
 
 //opción 6 para el factorial
 .L_opcion6: 
+  
+  mov     x0, #1
+    ldr     x1, =msgfactorial 
+    mov     x2, #lenfactorial
+    mov     x8, #64         //escritura
+    svc     #0
 
+    mov     x0, #0
+    ldr     x1, =numfactorial         
+    mov     x2, #10
+    mov     x8, #63         //lectura
+    svc     #0
+    mov     x21, x0
 
 // paso a texto para poder imprimir en panttalla
 
@@ -460,6 +544,10 @@ int_to_ascii_loop:
     mov     x0, #0 
     mov     x8, #93
     svc     #0 
+
+// ========================================================
+// SUBRUTINA CORREGIDA: ascii_to_int
+
 
 //funciones para la suma
 ascii_to_int:
