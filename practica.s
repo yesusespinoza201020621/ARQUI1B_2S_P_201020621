@@ -30,8 +30,8 @@ len9 = . - potencia9
 
 factorial10:     .ascii "Opcion 6 factorial \n"
 len10 = . - factorial10
-
-mensajerror:     .ascii "las opciones validas solo las del menu"
+ 
+mensajerror:     .ascii "numero, opción o caracter ingreso no valido vuelva a intentar \n"
 len11 = . - mensajerror
 
 num1:     .ascii "ingrese numero 1 \n"
@@ -39,6 +39,7 @@ len12 = . - num1
 
 num2:     .ascii "ingrese numero 2 \n"
 len13 = . - num2
+
 
 
 resultadosuma:       .ascii "El resultado de la suma es: "
@@ -81,6 +82,7 @@ newline:    .ascii "\n"
 opcion:       .space 16 
 numero1:      .space 16 
 numero2:      .space 16 
+
 numfactorial: .space 16
 res_txt:      .space 16 
 base:         .space 16 // variable para la base
@@ -206,7 +208,12 @@ _start:
     mov     x2, #10
     mov     x8, #63         
     svc     #0
-    mov     x21, x0  
+    mov     x21, x0 
+
+    ldr     x1, =numero1  
+    ldrb    w2, [x1]            // Leemos el primer carácter
+    cmp     w2, #'-'            
+    b.eq    .L_error
 
     mov     x0, #1
     ldr     x1, =num2
@@ -221,6 +228,11 @@ _start:
     svc     #0
     mov     x22, x0   
 
+    ldr     x1, =numero2  
+    ldrb    w2, [x1]            // Leemos el primer carácter
+    cmp     w2, #'-'            
+    b.eq    .L_error
+
     mov     x0, #1
     ldr     x1, =resultadosuma
     mov     x2, #len14
@@ -229,12 +241,12 @@ _start:
 
     ldr     x0, =numero1
     mov     x1, x21         
-    bl      ascii_to_int
+    bl      ascii_a_int
     mov     x19, x0         
 
     ldr     x0, =numero2
     mov     x1, x22         
-    bl      ascii_to_int
+    bl      ascii_a_int
     mov     x20, x0         
 
     add     x5, x19, x20   
@@ -257,6 +269,11 @@ _start:
     svc     #0
     mov     x21, x0  
 
+    ldr     x1, =numero1  
+    ldrb    w2, [x1]            // Leemos el primer carácter
+    cmp     w2, #'-'            
+    b.eq    .L_error
+    
     mov     x0, #1
     ldr     x1, =num2
     mov     x2, #len13
@@ -270,23 +287,33 @@ _start:
     svc     #0
     mov     x22, x0   
 
+    ldr     x1, =numero2  
+    ldrb    w2, [x1]            // Leemos el primer carácter
+    cmp     w2, #'-'            
+    b.eq    .L_error
+
+    ldr     x0, =numero1
+    mov     x1, x21         
+    bl      ascii_a_int
+    mov     x19, x0         
+
+    ldr     x0, =numero2
+    mov     x1, x22         
+    bl      ascii_a_int
+    mov     x20, x0         
+
+    sub     x5, x19, x20   
+
+    // resultado de la resta es negativo, mandar a error
+    cmp     x5, #0// es como un if
+    b.lt    .L_error
+
     mov     x0, #1
     ldr     x1, =resultadoresta
     mov     x2, #len16
     mov     x8, #64
     svc     #0
 
-    ldr     x0, =numero1
-    mov     x1, x21         
-    bl      ascii_to_int
-    mov     x19, x0         
-
-    ldr     x0, =numero2
-    mov     x1, x22         
-    bl      ascii_to_int
-    mov     x20, x0         
-
-    sub     x5, x19, x20   
     b       .L_imprimir_resultado
 
 
@@ -305,6 +332,11 @@ _start:
     svc     #0
     mov     x20, x0         
 
+    ldr     x1, =numero1  
+    ldrb    w2, [x1]            // Leemos el primer carácter
+    cmp     w2, #'-'            
+    b.eq    .L_error
+
     mov     x0, #1
     ldr     x1, =num2       
     mov     x2, #len13
@@ -318,6 +350,12 @@ _start:
     svc     #0
     mov     x21, x0         
 
+    ldr   x1, =numero2  
+    ldrb    w2, [x1]            // Leemos el primer carácter
+    cmp     w2, #'-'            
+    b.eq    .L_error
+
+
     mov     x0, #1
     ldr     x1, =resultadomulti       
     mov     x2, #len15
@@ -326,12 +364,12 @@ _start:
 
     ldr     x0, =numero1 
     mov     x1, x20         
-    bl      ascii_to_int
+    bl      ascii_a_int
     mov     x19, x0         
 
     ldr     x0, =numero2
     mov     x1, x21         
-    bl      ascii_to_int    
+    bl      ascii_a_int    
     mov     x20, x0         
 
     mul     x5, x19, x20    
@@ -354,11 +392,17 @@ _start:
     svc     #0
     mov     x21, x0  
 
+    ldr     x1, =numero1  
+    ldrb    w2, [x1]            // Leemos el primer carácter
+    cmp     w2, #'-'            
+    b.eq    .L_error
+
     mov     x0, #1
     ldr     x1, =num2
     mov     x2, #len13
     mov     x8, #64         
     svc     #0
+
 
     mov     x0, #0
     ldr     x1, =numero2
@@ -367,14 +411,19 @@ _start:
     svc     #0
     mov     x22, x0   
 
+    ldr     x1, =numero2  
+    ldrb    w2, [x1]            // Leemos el primer carácter
+    cmp     w2, #'-'            
+    b.eq    .L_error
+
     ldr     x0, =numero1
     mov     x1, x21         
-    bl      ascii_to_int
+    bl      ascii_a_int
     mov     x19, x0         
 
     ldr     x0, =numero2
     mov     x1, x22         
-    bl      ascii_to_int
+    bl      ascii_a_int
     mov     x20, x0         
 
     // esto por si es entre cero
@@ -427,23 +476,23 @@ _start:
 
     ldr     x0, =base
     mov     x1, x21         
-    bl      ascii_to_int
+    bl      ascii_a_int
     mov     x19, x0         // X19 = Base matemática
 
     ldr     x0, =exponente
     mov     x1, x22         
-    bl      ascii_to_int
+    bl      ascii_a_int
     mov     x20, x0         // X20 = Exponente matemático
 
     mov     x5, #1          // El acumulador empieza en 1 (Caso base para exponente = 0)
 
-.L_potencia_loop:
+.L_potencia:
     cmp     x20, #0         // ¿El exponente llegó a 0?
     b.eq    .L_imprimir_resultado
 
     mul     x5, x5, x19     // X5 = acumulador * base
     sub     x20, x20, #1    // exponente = exponente - 1
-    b       .L_potencia_loop //aqui hace el ciclo repetivo hasta llegar a cero 0
+    b       .L_potencia //aqui hace el ciclo repetivo hasta llegar a cero 0
 
 //opción 6 para el factorial
 .L_opcion6: 
@@ -461,6 +510,35 @@ _start:
     svc     #0
     mov     x21, x0
 
+    ldr     x1, =numfactorial   // Cargamos la dirección del texto ingresado
+    ldrb    w2, [x1]            
+    cmp     w2, #'-'            // ¿Es un signo menos?
+    b.eq    .L_error            // Si es igual, salta directo al error general
+
+    ldr     x0, =numfactorial
+    mov     x1, x21
+    bl      ascii_a_int
+    mov     x19, x0         // X19 = Número para el factorial
+
+
+
+    mov     x0, #1
+    ldr     x1, =resultadofact
+    mov     x2, #len_resultado
+    mov     x8, #64
+    svc     #0
+
+    // Lógica del cálculo factorial
+    mov     x5, #1          //comenzamos en 1
+
+//la funcion recursiva para el factorial
+    .L_factorial:
+     
+    cmp     x19, #1
+    b.le    .L_imprimir_resultado // Si es menor o igual a 1 (0! o 1!), termina y muestra el 1 acumulado
+    mul     x5, x5, x19     // x5 = x5 * x19
+    sub     x19, x19, #1    // Decrementar el contador en 1
+    b       .L_factorial
 // paso a texto para poder imprimir en panttalla
 
 .L_imprimir_resultado:
@@ -469,7 +547,7 @@ _start:
     mov     x2, #10         
     mov     x6, #0          
 
-int_to_ascii_loop:
+int_a_ascii_loop:
     udiv    x3, x5, x2      
     msub    x4, x3, x2, x5 
     add     x4, x4, #48     
@@ -477,7 +555,7 @@ int_to_ascii_loop:
     strb    w4, [x1]        
     add     x6, x6, #1      
     mov     x5, x3          
-    cbnz    x5, int_to_ascii_loop
+    cbnz    x5, int_a_ascii_loop
 
     mov     x0, #1
     mov     x2, x6          
@@ -506,6 +584,8 @@ int_to_ascii_loop:
     mov     x8, #64         
     svc     #0
 
+    b       .L_evaluar_continuar
+
 .L_errordivision: 
     mov     x0, #1
     ldr     x1, =mensajerrordivision
@@ -518,6 +598,7 @@ int_to_ascii_loop:
     mov     x2, #1
     mov     x8, #64         
     svc     #0
+
 .L_evaluar_continuar:
     mov     x0, #1
     ldr     x1, =msg_desea_continuar
@@ -545,12 +626,9 @@ int_to_ascii_loop:
     mov     x8, #93
     svc     #0 
 
-// ========================================================
-// SUBRUTINA CORREGIDA: ascii_to_int
-
-
 //funciones para la suma
-ascii_to_int:
+// paso el ascii a entero por direcciones y apuntadoraes
+ascii_a_int:
     mov     x2, #0          
     mov     x3, #0          
     mov     x4, #10         
